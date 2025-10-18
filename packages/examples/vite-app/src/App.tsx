@@ -5,7 +5,7 @@ import {
   type GridHandle,
   SELECTION_OVERRIDES,
   CELL_OVERRIDES,
-} from '@parlanceis/grid'
+} from '@coleski/grid'
 
 // Simple wrapper was unused; render CanvasDataGrid directly
 
@@ -467,7 +467,7 @@ export default function App() {
   return (
     <main style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ marginBottom: '48px', textAlign: 'center' }}>
-        <h1 style={{ color: '#1e293b', marginBottom: '8px' }}>@parlanceis/grid</h1>
+        <h1 style={{ color: '#1e293b', marginBottom: '8px' }}>@coleski/grid</h1>
         <p style={{ color: '#64748b', fontSize: '18px', margin: '0' }}>
           Ultra-fast canvas-based data grid for React
         </p>
