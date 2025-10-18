@@ -1,5 +1,5 @@
 {
-  "name": "@coleski/vite-example",
+  "name": "@coleski/datagrid-vite-example",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -11,7 +11,7 @@
     "clean": "rm -rf dist *.tsbuildinfo"
   },
   "dependencies": {
-    "@coleski/grid": "workspace:*",
+    "@coleski/datagrid": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

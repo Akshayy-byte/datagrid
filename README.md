@@ -1,6 +1,6 @@
-# @coleski/grid
+# @coleski/datagrid
 
-[![npm version](https://img.shields.io/npm/v/@coleski/grid.svg)](https://www.npmjs.com/package/@coleski/grid)
+[![npm version](https://img.shields.io/npm/v/@coleski/datagrid.svg)](https://www.npmjs.com/package/@coleski/datagrid)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Ultra-fast canvas-based data grid for React.
@@ -10,17 +10,17 @@ Ultra-fast canvas-based data grid for React.
 ## Installation
 
 ```bash
-npm install @coleski/grid
+npm install @coleski/datagrid
 # or
-bun add @coleski/grid
+bun add @coleski/datagrid
 # or
-yarn add @coleski/grid
+yarn add @coleski/datagrid
 ```
 
 ## Quick Start
 
 ```tsx
-import { Grid } from '@coleski/grid'
+import { Grid } from '@coleski/datagrid'
 
 function App() {
   return <Grid />
@@ -73,7 +73,7 @@ bun run release
 ### Project Structure
 
 ```
-@coleski/grid/
+@coleski/datagrid/
 ├── packages/
 │   ├── grid/              # Main Grid component library
 │   └── examples/
@@ -165,7 +165,7 @@ MIT © Parlance Intelligence Systems (original author)
 
 ## Links
 
-- [Documentation](https://github.com/coleski/datagrids#readme)
-- [NPM Package](https://www.npmjs.com/package/@coleski/grid)
-- [Issue Tracker](https://github.com/coleski/datagrids/issues)
-- [Changelog](https://github.com/coleski/datagrids/blob/main/CHANGELOG.md)
+- [Documentation](https://github.com/coleski/datagrid#readme)
+- [NPM Package](https://www.npmjs.com/package/@coleski/datagrid)
+- [Issue Tracker](https://github.com/coleski/datagrid/issues)
+- [Changelog](https://github.com/coleski/datagrid/blob/main/CHANGELOG.md)

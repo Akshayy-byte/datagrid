@@ -1,4 +1,4 @@
-# @coleski/grid
+# @coleski/datagrid
 
 Ultra-fast canvas-based data grid for React.
 
@@ -7,15 +7,15 @@ Ultra-fast canvas-based data grid for React.
 ## Installation
 
 ```bash
-npm install @coleski/grid
+npm install @coleski/datagrid
 # or
-bun add @coleski/grid
+bun add @coleski/datagrid
 ```
 
 ## Usage
 
 ```tsx
-import { Grid } from '@coleski/grid'
+import { Grid } from '@coleski/datagrid'
 
 function App() {
   return <Grid />

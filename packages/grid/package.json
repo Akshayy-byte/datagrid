@@ -1,5 +1,5 @@
 {
-  "name": "@coleski/grid",
+  "name": "@coleski/datagrid",
   "version": "0.8.0",
   "description": "Ultra-fast canvas-based data grid for React",
   "type": "module",
@@ -42,12 +42,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/coleski/datagrids.git",
+    "url": "https://github.com/coleski/datagrid.git",
     "directory": "packages/grid"
   },
-  "homepage": "https://github.com/coleski/datagrids#readme",
+  "homepage": "https://github.com/coleski/datagrid#readme",
   "bugs": {
-    "url": "https://github.com/coleski/datagrids/issues"
+    "url": "https://github.com/coleski/datagrid/issues"
   },
   "keywords": [
     "react",
