@@ -220,13 +220,13 @@ export class KeyboardNavigationManager {
       if (!this.state.selectionAnchor) {
         this.state.selectionAnchor = this.state.focusedCell;
       }
-      
+
       const selection = expandSelectionToRange(
         this.state.selectionAnchor,
         newCell,
         'cell'
       );
-      
+
       this.gridHandle.setSelection(selection);
     } else {
       // Single cell selection
@@ -239,7 +239,7 @@ export class KeyboardNavigationManager {
     }
 
     this.state.focusedCell = newCell;
-    
+
     // Scroll to ensure cell is visible
     this.gridHandle.scrollToCell(newCell.row, newCell.col, 'nearest');
   }
@@ -490,11 +490,13 @@ export function createFocusableElement(
   focusElement.style.width = '100%';
   focusElement.style.height = '100%';
   focusElement.style.opacity = '0';
+  focusElement.style.outline = 'none';
   focusElement.style.pointerEvents = 'none';
   focusElement.setAttribute('role', 'grid');
-  
+  focusElement.setAttribute('aria-label', 'Data grid');
+
   focusElement.addEventListener('keydown', onKeyDown);
-  
+
   container.appendChild(focusElement);
   return focusElement;
 }

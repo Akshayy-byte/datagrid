@@ -139,6 +139,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
   const columnResizeManagerRef = useRef<ColumnResizeManager | null>(null);
   const [themeResolver, setThemeResolver] = useState<ThemeResolver | null>(null);
   const [dataStats, setDataStats] = useState<{ rowCount: number; columnCount: number } | null>(null);
+  const handleKeyDownRef = useRef<((event: KeyboardEvent) => void) | null>(null);
 
   // Local UI state
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
@@ -849,6 +850,11 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     }
   }, [onKeyDown, handle]);
 
+  // Keep handleKeyDown ref up to date
+  useEffect(() => {
+    handleKeyDownRef.current = handleKeyDown;
+  }, [handleKeyDown]);
+
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -870,9 +876,13 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     if (focusElementRef.current) {
       focusElementRef.current.remove();
     }
+
+    // Create focus element with a wrapper that calls the latest handleKeyDown
     focusElementRef.current = createFocusableElement(
       containerRef.current,
-      handleKeyDown
+      (e) => {
+        handleKeyDownRef.current?.(e);
+      }
     );
 
     return () => {
@@ -880,7 +890,26 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
         focusElementRef.current.remove();
       }
     };
-  }, [handle, handleKeyDown, navRowCount, navColumnCount]);
+  }, []); // Empty deps - only create once on mount
+
+  // Update keyboard manager options when they change
+  useEffect(() => {
+    if (keyboardManagerRef.current) {
+      keyboardManagerRef.current.updateOptions({
+        enableArrowKeys: true,
+        enablePageKeys: true,
+        enableHomeEndKeys: true,
+        enableTabKey: true,
+        enableEnterKey: true,
+        enableEscapeKey: true,
+        enableSelectionKeys: true,
+        rowCount: navRowCount,
+        columnCount: navColumnCount,
+        pageSize: 10,
+      });
+      keyboardManagerRef.current.setGridHandle(handle);
+    }
+  }, [navRowCount, navColumnCount, handle]);
 
   useEffect(() => {
     if (themeResolver || !containerRef.current) return;

@@ -101,7 +101,8 @@ function BasicGridExample() {
           background: '#f0f9ff',
           border: '1px solid #0ea5e9',
           borderRadius: '4px',
-          fontSize: '14px'
+          fontSize: '14px',
+          color: '#0f172a'
         }}>
           Selection: <strong>{selection.type}</strong> -
           {selection.type === 'cell'
@@ -267,7 +268,8 @@ function VirtualGridExample() {
           background: '#fef3c7',
           border: '1px solid #f59e0b',
           borderRadius: '4px',
-          fontSize: '14px'
+          fontSize: '14px',
+          color: '#78350f'
         }}>
           Virtual Selection: Row {selection.type === 'cell' ? selection.start.row + 1 : 'N/A'}
         </div>
@@ -481,7 +483,7 @@ export default function App() {
 
       <footer style={{ marginTop: '64px', padding: '24px', background: '#f8fafc', borderRadius: '8px' }}>
         <h3 style={{ marginTop: '0', color: '#1e293b' }}>Features Demonstrated</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', fontSize: '14px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px', fontSize: '14px', color: '#475569' }}>
           <ul style={{ margin: '0', paddingLeft: '20px' }}>
             <li>Full data mode (small datasets)</li>
             <li>Virtual scrolling (large datasets)</li>
@@ -491,7 +493,7 @@ export default function App() {
           </ul>
           <ul style={{ margin: '0', paddingLeft: '20px' }}>
             <li>Selection with smooth transitions</li>
-            <li>Keyboard navigation</li>
+            <li>Keyboard navigation <span style={{ fontSize: '12px', color: '#f59e0b' }}>(Coming Soon)</span></li>
             <li>Custom theming</li>
             <li>Draw overrides</li>
           </ul>
@@ -504,8 +506,8 @@ export default function App() {
         </div>
 
         <div style={{ marginTop: '24px', padding: '16px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '6px' }}>
-          <h4 style={{ marginTop: '0', marginBottom: '8px' }}>Keyboard Shortcuts</h4>
-          <div style={{ fontSize: '13px', color: '#6b7280', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+          <h4 style={{ marginTop: '0', marginBottom: '8px', color: '#1e293b' }}>Keyboard Shortcuts <span style={{ fontSize: '12px', color: '#f59e0b', fontWeight: 'normal' }}>(Coming Soon)</span></h4>
+          <div style={{ fontSize: '13px', color: '#64748b', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
             <div><kbd>Arrow Keys</kbd> - Navigate cells</div>
             <div><kbd>Shift + Arrows</kbd> - Extend selection</div>
             <div><kbd>Ctrl/Cmd + A</kbd> - Select all</div>
