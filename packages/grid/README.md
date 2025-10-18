@@ -1,19 +1,21 @@
-# @parlanceis/grid
+# @coleski/grid
 
 Ultra-fast canvas-based data grid for React.
+
+> **Note**: Originally created by [Archer Hume](https://github.com/archerhume).
 
 ## Installation
 
 ```bash
-npm install @parlanceis/grid
+npm install @coleski/grid
 # or
-bun add @parlanceis/grid
+bun add @coleski/grid
 ```
 
 ## Usage
 
 ```tsx
-import { Grid } from '@parlanceis/grid'
+import { Grid } from '@coleski/grid'
 
 function App() {
   return <Grid />
@@ -22,4 +24,4 @@ function App() {
 
 ## License
 
-MIT © Parlance Intelligence Systems
+MIT © Parlance Intelligence Systems (original author)

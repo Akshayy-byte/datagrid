@@ -1,6 +1,6 @@
 {
   "name": "@coleski/grid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Ultra-fast canvas-based data grid for React",
   "type": "module",
   "sideEffects": false,

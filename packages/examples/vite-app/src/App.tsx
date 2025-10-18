@@ -284,7 +284,7 @@ function VirtualGridExample() {
           pageSize={500}
           prefetch={true}
           resizable
-          formatCell={(value: string, row: number, col: number) => {
+          formatCell={(value: string, _row: number, col: number) => {
             if (col === 2) { // Amount column
               return {
                 textAlign: 'right' as const,
