@@ -1,0 +1,87 @@
+---
+title: 10 Million Rows
+description: 10 Million Rows
+icon: FileChartLine
+---
+
+## 10 Million Rows with Virtual Scrolling and UUIDs
+
+This example demonstrates rendering a table with 10,000,000 rows using the grid's virtual mode. Rows are generated on-demand with `crypto.randomUUID()`, and the table displays three UUID columns only.
+
+<Tabs items={['Live', 'Code']}>
+  <Tab className="p-0">
+    <TenMillionRowsGrid />
+  </Tab>
+  <Tab>
+    ```tsx
+    'use client';
+
+    import React from 'react';
+    import { CanvasDataGrid } from '@parlanceis/grid';
+
+    function generateUuidV4(seedA: number, seedB: number): string {
+      let a = seedA | 0;
+      let b = seedB | 0;
+      const rand32 = () => {
+        a ^= a << 13;
+        a ^= a >>> 17;
+        a ^= a << 5;
+        a |= 0;
+        b = (b + 0x9e3779b9) | 0;
+        return (a ^ b) >>> 0;
+      };
+
+      const toHex = (n: number, pad: number) => n.toString(16).padStart(pad, '0');
+      const p1 = toHex(rand32(), 8);
+      const p2 = toHex(rand32() & 0xffff, 4);
+      const p3 = toHex((rand32() & 0x0fff) | 0x4000, 4);
+      const p4 = toHex((rand32() & 0x3fff) | 0x8000, 4);
+      const p5 = toHex(rand32(), 8) + toHex(rand32(), 8);
+      return `${p1}-${p2}-${p3}-${p4}-${p5.slice(0, 12)}`;
+    }
+
+    const headers = ['ID A', 'ID B', 'ID C'] as const;
+
+    type Row = [string, string, string];
+
+    async function fetchRows(offset: number, limit: number): Promise<Row[]> {
+      await new Promise((r) => setTimeout(r, 10));
+      const rows: Row[] = new Array(limit);
+      for (let i = 0; i < limit; i++) {
+        rows[i] = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
+      }
+      return rows;
+    }
+
+    export default function TenMillionRowsGrid() {
+      // Minimal wrapper: just the grid
+
+      return (
+        <div style={{ height: 420 }}>
+          <CanvasDataGrid
+            mode="virtual"
+            rowCount={10_000_000}
+            columnCount={headers.length}
+            headers={headers as unknown as string[]}
+            fetchRows={fetchRows}
+            pageSize={1000}
+            prefetch
+            resizable
+            minColumnWidth={220}
+            selectionTransitionDuration={120}
+            ariaLabel="Virtual grid with 10 million rows"
+          />
+        </div>
+      );
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### How it works
+
+- The grid runs in **virtual** mode, so only visible rows are rendered.
+- `fetchRows(offset, limit)` is called by the grid to fetch the current window of data.
+- Each row gets three UUID fields via `crypto.randomUUID()`.
+- The example sets `rowCount` to 10,000,000 and uses a `pageSize` of 1000 with `prefetch`.
+- Formatting is applied for amount, status, and priority to make the demo visually informative.

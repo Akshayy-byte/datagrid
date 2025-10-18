@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* Remove header/nav bottom border on the home page only */
+.home-no-nav-border header,
+.home-no-nav-border .fd-header,
+.home-no-nav-border nav {
+  border-bottom: none !important;
+}

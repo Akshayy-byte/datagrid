@@ -1,0 +1,21 @@
+{
+  "root": true,
+  "pages": [
+    "index",
+    "what-is-parlance-grid",
+    "...",
+    "---Guides---",
+    "theming",
+    "column-management",
+    "virtual-scrolling",
+    "selections",
+    "component-overlays",
+    "render-overrides",
+    "keyboard-navigation",
+    "best-practices",
+    "---API Reference---",
+    "canvas-data-grid",
+    "use-grid",
+    "themes"
+  ]
+}

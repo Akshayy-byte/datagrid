@@ -1,0 +1,101 @@
+---
+title: Quick Start
+description: Getting Started with Parlance Grid
+icon: Album
+---
+
+## Introduction
+
+Parlance Grid is __100% canvas-driven__, __MIT-licensed__, __fully-typed__ datagrid for React that handles millions of rows while staying easy to shape to your needs.
+
+The package is built with two principles in mind:
+1. __Performance__ - The grid should be able to handle millions of rows while staying performant.
+2. __Customization__ - The grid should be easy to shape to your needs.
+
+To achieve this, the package architecture is designed to be highly modular with a strong separation of concerns, allowing the developer to hook into the grid at any layer and extend it to their needs. The Parlance Grid architecture consists of the following 4 modules:
+
+<Cards>
+
+<Card icon={<AtomIcon className="text-blue-300" />} title='React Canvas Component'>
+
+This is the core component that includes the canvas element, and orchestrates the communication between the other modules.
+
+</Card>
+
+<Card icon={<CpuIcon className="text-orange-300" />} title='State Engine'>
+
+The state engine is responsible for managing the state of the grid, including scrolling, selections, interactions, and data-fetching.
+
+</Card>
+
+<Card icon={<LayoutDashboardIcon className="text-green-300" />} title='Layout Engine'>
+
+The layout engine is responsible for calculating the position and size of the cells, and the visible range of the grid, along with other layout-related calculations.
+
+</Card>
+
+<Card icon={<BrushIcon className="text-teal-300" />} title='Rendering Engine'>
+
+The rendering engine uses the layout engine's output to render the grid to the canvas, with overrides at every stage of the rendering process.
+
+</Card>
+
+</Cards>
+
+
+## Installation
+
+To install the package, run the following command:
+
+<Tabs items={['Bun', 'Npm', 'Yarn', 'Pnpm']}>
+  <Tab>
+  ```bash
+  bun add @parlanceis/grid
+  ```
+  </Tab>
+  <Tab>
+  ```bash
+  npm install @parlanceis/grid
+  ```
+  </Tab>
+  <Tab>
+  ```bash
+  yarn add @parlanceis/grid
+  ```
+  </Tab>
+  <Tab>
+  ```bash
+  pnpm add @parlanceis/grid
+  ```
+  </Tab>
+</Tabs>
+
+## Usage
+
+To use the grid, you need to import the `Grid` component from the `@parlanceis/grid` package.
+
+```tsx
+import { Grid } from '@parlanceis/grid'
+
+function App() {
+  return <Grid />
+}
+```
+
+## Learn More
+
+There are many different ways to use the grid, to figure out how to best use the grid, continue reading the documentation.
+
+## FAQs
+
+<Accordions>
+  <Accordion title="Is Parlance Grid open source?">
+    Yes, Parlance Grid is open source and MIT licensed. You can find the source code on [GitHub](https://github.com/Parlance-Intelligence-Systems/grid).
+  </Accordion>
+  <Accordion title="When should I use Parlance Grid?">
+    Yes, Parlance Grid is fully typed. You can find the type definitions on [GitHub](https://github.com/Parlance-Intelligence-Systems/grid).
+  </Accordion>
+  <Accordion title="How can I contribute to Parlance Grid?">
+    Yes, Parlance Grid is fully typed. You can find the type definitions on [GitHub](https://github.com/Parlance-Intelligence-Systems/grid).
+  </Accordion>
+</Accordions>
