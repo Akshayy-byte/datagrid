@@ -5,7 +5,7 @@
 
 Ultra-fast canvas-based data grid for React.
 
-> **Note**: Originally created by [Archer Hume](https://github.com/archerhume). Now maintained by [Cole Benefield](https://github.com/coleski).
+> **Note**: Originally created by [Archer Hume](https://github.com/archerhume).
 
 ## Installation
 
