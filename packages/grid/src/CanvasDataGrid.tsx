@@ -132,6 +132,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const focusElementRef = useRef<HTMLElement | null>(null);
+  const focusElementDestroyRef = useRef<(() => void) | null>(null);
   const handleRef = useRef<GridHandle | null>(null);
   const dataManagerRef = useRef<DataManager | null>(null);
   // AnchorCalculator ref comes from controller
@@ -768,6 +769,19 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     hoveringHorizontalThumb,
   ]);
 
+  // Auto-focus the grid when a selection is made (enables keyboard shortcuts)
+  useEffect(() => {
+    if (selection && focusElementRef.current && typeof document !== 'undefined') {
+      // Only focus if the grid doesn't already have focus to avoid loops
+      if (document.activeElement !== focusElementRef.current) {
+        // Use a small delay to ensure the DOM is ready and prevent event loop issues
+        requestAnimationFrame(() => {
+          focusElementRef.current?.focus({ preventScroll: true });
+        });
+      }
+    }
+  }, [selection]);
+
   // selectionRect derivation is centralized in controller
 
   // Controlled selection sync handled in controller
@@ -819,6 +833,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
 
   // Event handlers
   const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    console.log('[GRID handleKeyDown] Called with key:', event.key);
     try {
       (dispatchEvent as any)?.({ type: 'keyDown', payload: event });
     } catch { }
@@ -826,15 +841,20 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     let userInfo: { handled: boolean } | undefined;
 
     if (onKeyDown) {
+      console.log('[GRID handleKeyDown] Calling user onKeyDown');
       userInfo = { handled: false };
       onKeyDown(event as any, handle, userInfo);
     }
 
     const userHandled = userInfo?.handled === true;
     const manager = keyboardManagerRef.current;
+    console.log('[GRID handleKeyDown] manager:', manager, 'defaultPrevented:', event.defaultPrevented, 'userHandled:', userHandled);
+
     if (!event.defaultPrevented && !userHandled && manager) {
       const currentState = handle.getState();
+      console.log('[GRID handleKeyDown] Calling manager.handleKeyDown, selection:', currentState.selection);
       handled = manager.handleKeyDown(event, currentState.selection);
+      console.log('[GRID handleKeyDown] Manager returned handled:', handled);
       if (handled) {
         event.preventDefault();
       }
@@ -848,6 +868,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     if (userInfo) {
       userInfo.handled = handled;
     }
+    console.log('[GRID handleKeyDown] Final handled:', handled);
   }, [onKeyDown, handle]);
 
   // Keep handleKeyDown ref up to date
@@ -873,22 +894,35 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
 
     keyboardManagerRef.current.setGridHandle(handle);
 
-    if (focusElementRef.current) {
-      focusElementRef.current.remove();
+    if (focusElementDestroyRef.current) {
+      focusElementDestroyRef.current();
+      focusElementDestroyRef.current = null;
+      focusElementRef.current = null;
     }
 
     // Create focus element with a wrapper that calls the latest handleKeyDown
-    focusElementRef.current = createFocusableElement(
+    const { element, destroy } = createFocusableElement(
       containerRef.current,
       (e) => {
         handleKeyDownRef.current?.(e);
+      },
+      () => {
+        // Check if there's an active selection
+        const currentState = handleRef.current?.getState();
+        const hasSelection = currentState?.selection != null;
+        console.log('[GRID hasSelection] Checking selection:', currentState?.selection, 'result:', hasSelection);
+        return hasSelection;
       }
     );
+    focusElementRef.current = element;
+    focusElementDestroyRef.current = destroy;
 
     return () => {
-      if (focusElementRef.current) {
-        focusElementRef.current.remove();
+      if (focusElementDestroyRef.current) {
+        focusElementDestroyRef.current();
+        focusElementDestroyRef.current = null;
       }
+      focusElementRef.current = null;
     };
   }, []); // Empty deps - only create once on mount
 
@@ -908,6 +942,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
         pageSize: 10,
       });
       keyboardManagerRef.current.setGridHandle(handle);
+      keyboardManagerRef.current.setFocusElement(focusElementRef.current);
     }
   }, [navRowCount, navColumnCount, handle]);
 
@@ -916,6 +951,23 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     setThemeResolver(new ThemeResolver(containerRef.current));
   }, [themeResolver]);
 
+  // Clear selection when clicking outside the grid
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+
+      // Check if click is outside the grid container
+      if (!containerRef.current.contains(event.target as Node)) {
+        console.log('[GRID] Click outside detected, clearing selection');
+        handle.clearSelection();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handle]);
 
   // Expose handle via ref
   useImperativeHandle(ref, () => handle, [handle]);
