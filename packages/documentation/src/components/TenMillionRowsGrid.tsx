@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { CanvasDataGrid } from '@parlanceis/grid';
+import { CanvasDataGrid } from '@coleski/datagrid';
 
 const headers = ['ID A', 'ID B', 'ID C'] as const;
 
