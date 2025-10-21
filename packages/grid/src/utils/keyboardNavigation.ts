@@ -27,6 +27,7 @@ export class KeyboardNavigationManager {
   private options: KeyboardNavigationOptions;
   private state: KeyboardNavigationState;
   private gridHandle: GridHandle | null = null;
+  private focusElement: HTMLElement | null = null;
 
   constructor(options: KeyboardNavigationOptions) {
     this.options = options;
@@ -42,6 +43,10 @@ export class KeyboardNavigationManager {
 
   public setGridHandle(handle: GridHandle): void {
     this.gridHandle = handle;
+  }
+
+  public setFocusElement(element: HTMLElement | null): void {
+    this.focusElement = element;
   }
 
   public handleKeyDown(
@@ -239,8 +244,6 @@ export class KeyboardNavigationManager {
     }
 
     this.state.focusedCell = newCell;
-
-    // Scroll to ensure cell is visible
     this.gridHandle.scrollToCell(newCell.row, newCell.col, 'nearest');
   }
 
@@ -330,7 +333,6 @@ export class KeyboardNavigationManager {
     }
 
     this.state.focusedCell = newCell;
-    
     const align = modifierKey ? 'center' : 'nearest';
     this.gridHandle.scrollToCell(newCell.row, newCell.col, align);
   }
@@ -403,6 +405,11 @@ export class KeyboardNavigationManager {
     // Clear selection and reset anchor
     this.state.selectionAnchor = null;
     this.gridHandle.clearSelection();
+
+    // Blur the focus element to return focus to the page
+    if (this.focusElement && typeof document !== 'undefined') {
+      this.focusElement.blur();
+    }
   }
 
   private handleSelectAll(): void {
@@ -480,8 +487,9 @@ export function getGridAriaLabel(
 // Focus management utilities
 export function createFocusableElement(
   container: HTMLElement,
-  onKeyDown: (event: KeyboardEvent) => void
-): HTMLElement {
+  onKeyDown: (event: KeyboardEvent) => void,
+  hasSelection?: () => boolean
+): { element: HTMLElement; destroy: () => void } {
   const focusElement = document.createElement('div');
   focusElement.tabIndex = 0;
   focusElement.style.position = 'absolute';
@@ -492,11 +500,48 @@ export function createFocusableElement(
   focusElement.style.opacity = '0';
   focusElement.style.outline = 'none';
   focusElement.style.pointerEvents = 'none';
+  focusElement.style.zIndex = '-1';
   focusElement.setAttribute('role', 'grid');
   focusElement.setAttribute('aria-label', 'Data grid');
 
-  focusElement.addEventListener('keydown', onKeyDown);
+  const ownerDocument = container.ownerDocument ?? document;
+  const handleKeyDown = (event: KeyboardEvent) => {
+    // Check if we should handle this key (navigation keys)
+    const isNavigationKey = [
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'PageUp', 'PageDown', 'Home', 'End', 'Tab', 'Enter', 'Escape'
+    ].includes(event.key) || (event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey));
 
+    const hasSelectionResult = hasSelection?.();
+
+    // If it's a navigation key and the grid has a selection,
+    // ensure focus and let the handler decide preventDefault
+    if (isNavigationKey && hasSelectionResult) {
+      // Focus the element if not already focused
+      if (ownerDocument.activeElement !== focusElement) {
+        focusElement.focus({ preventScroll: true });
+      }
+      onKeyDown(event);
+      // Prevent default AFTER calling handler, so handler can process it
+      if (!event.defaultPrevented) {
+        event.preventDefault();
+      }
+      event.stopPropagation();
+      return;
+    }
+
+    // Otherwise, only handle if already focused
+    if (ownerDocument.activeElement !== focusElement) return;
+    onKeyDown(event);
+  };
+
+  ownerDocument.addEventListener('keydown', handleKeyDown, true);
   container.appendChild(focusElement);
-  return focusElement;
+  return {
+    element: focusElement,
+    destroy: () => {
+      ownerDocument.removeEventListener('keydown', handleKeyDown, true);
+      focusElement.remove();
+    },
+  };
 }

@@ -2,7 +2,7 @@
   "root": true,
   "pages": [
     "index",
-    "what-is-parlance-grid",
+    "what-is-datagrid",
     "...",
     "---Guides---",
     "theming",

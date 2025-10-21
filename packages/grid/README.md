@@ -24,4 +24,4 @@ function App() {
 
 ## License
 
-MIT © Parlance Intelligence Systems (original author)
+MIT © Cole Benefield

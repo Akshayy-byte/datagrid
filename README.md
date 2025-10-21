@@ -161,7 +161,7 @@ See [SECURITY.md](./SECURITY.md) for security policy and vulnerability reporting
 
 ## License
 
-MIT © Parlance Intelligence Systems (original author)
+MIT © Cole Benefield
 
 ## Links
 

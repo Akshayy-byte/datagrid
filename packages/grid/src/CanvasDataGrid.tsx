@@ -18,6 +18,7 @@ import { normalizeColumnOrder } from './utils/columnLayout';
 import { composeMouseHandlers } from './utils/mouse';
 import { selectionsEqual } from './utils/selectionPredicates';
 import { useColumnResize } from './hooks/useColumnResize';
+import { copySelectionToClipboard } from './utils/clipboard';
 // import { useColumnDrag } from './hooks/useColumnDrag';
 // import { useScrollbarInteractions } from './hooks/useScrollbarInteractions';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
@@ -132,6 +133,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const focusElementRef = useRef<HTMLElement | null>(null);
+  const focusElementDestroyRef = useRef<(() => void) | null>(null);
   const handleRef = useRef<GridHandle | null>(null);
   const dataManagerRef = useRef<DataManager | null>(null);
   // AnchorCalculator ref comes from controller
@@ -768,6 +770,19 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     hoveringHorizontalThumb,
   ]);
 
+  // Auto-focus the grid when a selection is made (enables keyboard shortcuts)
+  useEffect(() => {
+    if (selection && focusElementRef.current && typeof document !== 'undefined') {
+      // Only focus if the grid doesn't already have focus to avoid loops
+      if (document.activeElement !== focusElementRef.current) {
+        // Use a small delay to ensure the DOM is ready and prevent event loop issues
+        requestAnimationFrame(() => {
+          focusElementRef.current?.focus({ preventScroll: true });
+        });
+      }
+    }
+  }, [selection]);
+
   // selectionRect derivation is centralized in controller
 
   // Controlled selection sync handled in controller
@@ -818,7 +833,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
   });
 
   // Event handlers
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+  const handleKeyDown = useCallback(async (event: KeyboardEvent) => {
     try {
       (dispatchEvent as any)?.({ type: 'keyDown', payload: event });
     } catch { }
@@ -831,8 +846,46 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     }
 
     const userHandled = userInfo?.handled === true;
+
+    // Handle copy (Ctrl+C / Cmd+C)
+    if (!event.defaultPrevented && !userHandled &&
+        (event.key === 'c' || event.key === 'C') &&
+        (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
+      const currentState = handle.getState();
+      if (currentState.selection && dataManagerRef.current) {
+        const success = await copySelectionToClipboard(
+          currentState.selection,
+          dataManagerRef.current
+        );
+
+        if (success) {
+          // Visual feedback: flash selection green
+          const originalTheme = handle.getTheme();
+          const greenFill = 'rgba(34, 197, 94, 0.2)'; // green-500 with transparency
+          const greenBorder = 'rgba(34, 197, 94, 0.8)'; // green-500 more opaque for border
+
+          handle.setTheme({
+            selectionFill: greenFill,
+            selectionBorder: greenBorder
+          });
+
+          // Fade back to original after 300ms
+          setTimeout(() => {
+            handle.setTheme({
+              selectionFill: originalTheme.selectionFill,
+              selectionBorder: originalTheme.selectionBorder
+            });
+          }, 300);
+        }
+
+        event.preventDefault();
+        handled = true;
+      }
+    }
+
     const manager = keyboardManagerRef.current;
-    if (!event.defaultPrevented && !userHandled && manager) {
+
+    if (!handled && !event.defaultPrevented && !userHandled && manager) {
       const currentState = handle.getState();
       handled = manager.handleKeyDown(event, currentState.selection);
       if (handled) {
@@ -873,22 +926,33 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
 
     keyboardManagerRef.current.setGridHandle(handle);
 
-    if (focusElementRef.current) {
-      focusElementRef.current.remove();
+    if (focusElementDestroyRef.current) {
+      focusElementDestroyRef.current();
+      focusElementDestroyRef.current = null;
+      focusElementRef.current = null;
     }
 
     // Create focus element with a wrapper that calls the latest handleKeyDown
-    focusElementRef.current = createFocusableElement(
+    const { element, destroy } = createFocusableElement(
       containerRef.current,
       (e) => {
         handleKeyDownRef.current?.(e);
+      },
+      () => {
+        // Check if there's an active selection
+        const currentState = handleRef.current?.getState();
+        return currentState?.selection != null;
       }
     );
+    focusElementRef.current = element;
+    focusElementDestroyRef.current = destroy;
 
     return () => {
-      if (focusElementRef.current) {
-        focusElementRef.current.remove();
+      if (focusElementDestroyRef.current) {
+        focusElementDestroyRef.current();
+        focusElementDestroyRef.current = null;
       }
+      focusElementRef.current = null;
     };
   }, []); // Empty deps - only create once on mount
 
@@ -908,6 +972,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
         pageSize: 10,
       });
       keyboardManagerRef.current.setGridHandle(handle);
+      keyboardManagerRef.current.setFocusElement(focusElementRef.current);
     }
   }, [navRowCount, navColumnCount, handle]);
 
@@ -916,6 +981,22 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     setThemeResolver(new ThemeResolver(containerRef.current));
   }, [themeResolver]);
 
+  // Clear selection when clicking outside the grid
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+
+      // Check if click is outside the grid container
+      if (!containerRef.current.contains(event.target as Node)) {
+        handle.clearSelection();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [handle]);
 
   // Expose handle via ref
   useImperativeHandle(ref, () => handle, [handle]);

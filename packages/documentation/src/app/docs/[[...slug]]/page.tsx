@@ -26,7 +26,7 @@ export default async function Page(props: PageProps<'/docs/[[...slug]]'>) {
         <LLMCopyButton markdownUrl={`${page.url}.md`} />
         <ViewOptions
           markdownUrl={`${page.url}.md`}
-          githubUrl={`https://github.com/Parlance-Intelligence-Systems/grid/blob/main/packages/documentation/src/app/docs/content/docs/${page.path}`}
+          githubUrl={`https://github.com/coleski/datagrid/blob/main/packages/documentation/src/app/docs/content/docs/${page.path}`}
         />
       </div>
       <DocsBody>

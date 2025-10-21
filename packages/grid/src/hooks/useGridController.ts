@@ -642,24 +642,8 @@ export function useGridController(params: UseGridControllerParams) {
         try { drawRef?.current?.(); } catch {}
       }
     }
-    if (ev.type === 'keyDown') {
-      const e: KeyboardEvent = ev.payload;
-      if (!e.defaultPrevented) {
-        if (e.key === 'ArrowDown') {
-          composed.handle.setScroll((state.scrollTop ?? 0) + rowHeight, state.scrollLeft ?? 0);
-          handled = true;
-        } else if (e.key === 'ArrowUp') {
-          composed.handle.setScroll(Math.max(0, (state.scrollTop ?? 0) - rowHeight), state.scrollLeft ?? 0);
-          handled = true;
-        } else if (e.key === 'ArrowRight') {
-          composed.handle.setScroll(state.scrollTop ?? 0, (state.scrollLeft ?? 0) + 40);
-          handled = true;
-        } else if (e.key === 'ArrowLeft') {
-          composed.handle.setScroll(state.scrollTop ?? 0, Math.max(0, (state.scrollLeft ?? 0) - 40));
-          handled = true;
-        }
-      }
-    }
+    // Keyboard navigation is now handled by KeyboardNavigationManager in CanvasDataGrid.tsx
+    // This old implementation has been removed to prevent duplicate handling
     if (ev.type === 'pointerUp') {
       const drag = columnDragRef.current;
       if (draggableColumns && drag && drag.status === 'dragging' && Array.isArray(drag.previewOrder) && typeof params.onColumnOrderChange === 'function') {

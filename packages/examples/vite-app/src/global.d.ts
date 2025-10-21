@@ -1,4 +1,4 @@
-declare module '@parlanceis/grid' {
+declare module '@coleski/datagrid' {
   import * as React from 'react'
   export const CanvasDataGrid: React.ComponentType<any>
   export function useGrid<T = any>(ref: React.RefObject<any>, options?: any): any
