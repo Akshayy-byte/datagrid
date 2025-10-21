@@ -35,7 +35,49 @@ export interface ComposedGridStateOptions {
   themeResolver?: ThemeResolver | null;
 }
 
+// Helper: Check if an item (row/column) is fully visible in viewport
+function isItemFullyVisible(
+  itemStart: number,
+  itemEnd: number,
+  viewportStart: number,
+  viewportEnd: number
+): boolean {
+  return itemStart >= viewportStart && itemEnd <= viewportEnd;
+}
+
+// Helper: Calculate scroll position to bring item into view
+function calculateScrollPosition(
+  itemStart: number,
+  itemEnd: number,
+  viewportStart: number,
+  viewportEnd: number,
+  currentScroll: number,
+  viewportSize: number,
+  offset: number,
+  align: 'nearest' | 'start' | 'center' | 'end'
+): number {
+  const itemSize = itemEnd - itemStart;
+  const contentSize = viewportSize - offset;
+
+  if (align === 'center') {
+    return itemStart - offset - (contentSize - itemSize) / 2;
+  } else if (align === 'start') {
+    return itemStart - offset;
+  } else if (align === 'end') {
+    return itemEnd - viewportSize;
+  } else { // 'nearest'
+    if (itemStart < viewportStart) {
+      return itemStart - offset;
+    } else if (itemEnd > viewportEnd) {
+      return itemEnd - viewportSize;
+    }
+  }
+  return currentScroll;
+}
+
 export function useComposedGridState(options: ComposedGridStateOptions = {}) {
+  const scrollingRef = useRef(false);
+  const scrollRafRef = useRef<number | null>(null);
   const {
     initialTheme = {},
     initialSelection = null,
@@ -213,11 +255,83 @@ export function useComposedGridState(options: ComposedGridStateOptions = {}) {
     },
 
     scrollToCell(
-      _row: number,
-      _col: number,
-      _align: 'nearest' | 'start' | 'center' | 'end' = 'nearest'
+      row: number,
+      col: number,
+      align: 'nearest' | 'start' | 'center' | 'end' = 'nearest'
     ): void {
-      // TODO: Implement based on visible range and cell dimensions
+      // Prevent re-entrant calls during scroll animation
+      if (scrollingRef.current) return;
+
+      const state = this.getState();
+      const { canvasRect, scrollTop, scrollLeft, columnWidths } = state;
+
+      // Clamp to valid bounds
+      const clampedRow = Math.max(0, Math.min(totalRows - 1, row));
+      const clampedCol = Math.max(0, Math.min(totalColumns - 1, col));
+
+      // Calculate row boundaries in document coordinates
+      const rowTop = headerHeight + clampedRow * rowHeight;
+      const rowBottom = rowTop + rowHeight;
+
+      // Calculate viewport boundaries (accounting for fixed header)
+      const viewportTop = scrollTop + headerHeight;
+      const viewportBottom = scrollTop + canvasRect.height;
+
+      // Determine if scrolling is needed for row
+      const rowVisible = isItemFullyVisible(rowTop, rowBottom, viewportTop, viewportBottom);
+      const newScrollTop = rowVisible
+        ? scrollTop
+        : calculateScrollPosition(
+            rowTop,
+            rowBottom,
+            viewportTop,
+            viewportBottom,
+            scrollTop,
+            canvasRect.height,
+            headerHeight,
+            align
+          );
+
+      // Calculate column boundaries in document coordinates
+      let colLeft = columnWidths.gutter;
+      for (let i = 0; i < clampedCol && i < columnWidths.columns.length; i++) {
+        colLeft += columnWidths.columns[i] || 0;
+      }
+      const colRight = colLeft + (columnWidths.columns[clampedCol] || 0);
+
+      // Calculate viewport boundaries (accounting for gutter)
+      const viewportLeft = scrollLeft + columnWidths.gutter;
+      const viewportRight = scrollLeft + canvasRect.width;
+
+      // Determine if scrolling is needed for column
+      const colVisible = isItemFullyVisible(colLeft, colRight, viewportLeft, viewportRight);
+      const newScrollLeft = colVisible
+        ? scrollLeft
+        : calculateScrollPosition(
+            colLeft,
+            colRight,
+            viewportLeft,
+            viewportRight,
+            scrollLeft,
+            canvasRect.width,
+            columnWidths.gutter,
+            align
+          );
+
+      // Apply scroll if position changed
+      if (newScrollTop !== scrollTop || newScrollLeft !== scrollLeft) {
+        scrollingRef.current = true;
+        this.setScroll(newScrollTop, newScrollLeft);
+
+        // Clear guard on next animation frame
+        if (scrollRafRef.current !== null) {
+          cancelAnimationFrame(scrollRafRef.current);
+        }
+        scrollRafRef.current = requestAnimationFrame(() => {
+          scrollingRef.current = false;
+          scrollRafRef.current = null;
+        });
+      }
     },
 
     autosizeColumn(
