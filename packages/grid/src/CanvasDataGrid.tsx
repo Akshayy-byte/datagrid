@@ -18,6 +18,7 @@ import { normalizeColumnOrder } from './utils/columnLayout';
 import { composeMouseHandlers } from './utils/mouse';
 import { selectionsEqual } from './utils/selectionPredicates';
 import { useColumnResize } from './hooks/useColumnResize';
+import { copySelectionToClipboard } from './utils/clipboard';
 // import { useColumnDrag } from './hooks/useColumnDrag';
 // import { useScrollbarInteractions } from './hooks/useScrollbarInteractions';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
@@ -832,8 +833,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
   });
 
   // Event handlers
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    console.log('[GRID handleKeyDown] Called with key:', event.key);
+  const handleKeyDown = useCallback(async (event: KeyboardEvent) => {
     try {
       (dispatchEvent as any)?.({ type: 'keyDown', payload: event });
     } catch { }
@@ -841,20 +841,53 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     let userInfo: { handled: boolean } | undefined;
 
     if (onKeyDown) {
-      console.log('[GRID handleKeyDown] Calling user onKeyDown');
       userInfo = { handled: false };
       onKeyDown(event as any, handle, userInfo);
     }
 
     const userHandled = userInfo?.handled === true;
-    const manager = keyboardManagerRef.current;
-    console.log('[GRID handleKeyDown] manager:', manager, 'defaultPrevented:', event.defaultPrevented, 'userHandled:', userHandled);
 
-    if (!event.defaultPrevented && !userHandled && manager) {
+    // Handle copy (Ctrl+C / Cmd+C)
+    if (!event.defaultPrevented && !userHandled &&
+        (event.key === 'c' || event.key === 'C') &&
+        (event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey) {
       const currentState = handle.getState();
-      console.log('[GRID handleKeyDown] Calling manager.handleKeyDown, selection:', currentState.selection);
+      if (currentState.selection && dataManagerRef.current) {
+        const success = await copySelectionToClipboard(
+          currentState.selection,
+          dataManagerRef.current
+        );
+
+        if (success) {
+          // Visual feedback: flash selection green
+          const originalTheme = handle.getTheme();
+          const greenFill = 'rgba(34, 197, 94, 0.2)'; // green-500 with transparency
+          const greenBorder = 'rgba(34, 197, 94, 0.8)'; // green-500 more opaque for border
+
+          handle.setTheme({
+            selectionFill: greenFill,
+            selectionBorder: greenBorder
+          });
+
+          // Fade back to original after 300ms
+          setTimeout(() => {
+            handle.setTheme({
+              selectionFill: originalTheme.selectionFill,
+              selectionBorder: originalTheme.selectionBorder
+            });
+          }, 300);
+        }
+
+        event.preventDefault();
+        handled = true;
+      }
+    }
+
+    const manager = keyboardManagerRef.current;
+
+    if (!handled && !event.defaultPrevented && !userHandled && manager) {
+      const currentState = handle.getState();
       handled = manager.handleKeyDown(event, currentState.selection);
-      console.log('[GRID handleKeyDown] Manager returned handled:', handled);
       if (handled) {
         event.preventDefault();
       }
@@ -868,7 +901,6 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
     if (userInfo) {
       userInfo.handled = handled;
     }
-    console.log('[GRID handleKeyDown] Final handled:', handled);
   }, [onKeyDown, handle]);
 
   // Keep handleKeyDown ref up to date
@@ -909,9 +941,7 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
       () => {
         // Check if there's an active selection
         const currentState = handleRef.current?.getState();
-        const hasSelection = currentState?.selection != null;
-        console.log('[GRID hasSelection] Checking selection:', currentState?.selection, 'result:', hasSelection);
-        return hasSelection;
+        return currentState?.selection != null;
       }
     );
     focusElementRef.current = element;
@@ -958,7 +988,6 @@ export const CanvasDataGrid = forwardRef<GridHandle, CanvasDataGridProps>((props
 
       // Check if click is outside the grid container
       if (!containerRef.current.contains(event.target as Node)) {
-        console.log('[GRID] Click outside detected, clearing selection');
         handle.clearSelection();
       }
     };

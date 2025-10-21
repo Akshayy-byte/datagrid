@@ -53,11 +53,7 @@ export class KeyboardNavigationManager {
     event: KeyboardEvent | React.KeyboardEvent,
     currentSelection: SelectionRange | null
   ): boolean {
-    console.log('[KEYBOARD MANAGER] handleKeyDown called, key:', event.key);
-    if (!this.gridHandle) {
-      console.log('[KEYBOARD MANAGER] No gridHandle, returning false');
-      return false;
-    }
+    if (!this.gridHandle) return false;
 
     const { key, shiftKey, ctrlKey, metaKey } = event;
     const modifierKey = ctrlKey || metaKey;
@@ -65,10 +61,7 @@ export class KeyboardNavigationManager {
     // Initialize focused cell if not set
     if (!this.state.focusedCell) {
       this.state.focusedCell = this.getInitialFocusCell(currentSelection);
-      console.log('[KEYBOARD MANAGER] Initialized focusedCell:', this.state.focusedCell);
     }
-
-    console.log('[KEYBOARD MANAGER] About to handle key:', key);
 
     // Handle different key types
     switch (key) {
@@ -251,8 +244,6 @@ export class KeyboardNavigationManager {
     }
 
     this.state.focusedCell = newCell;
-
-    // Scroll to ensure cell is visible
     this.gridHandle.scrollToCell(newCell.row, newCell.col, 'nearest');
   }
 
@@ -342,7 +333,6 @@ export class KeyboardNavigationManager {
     }
 
     this.state.focusedCell = newCell;
-    
     const align = modifierKey ? 'center' : 'nearest';
     this.gridHandle.scrollToCell(newCell.row, newCell.col, align);
   }
@@ -516,36 +506,24 @@ export function createFocusableElement(
 
   const ownerDocument = container.ownerDocument ?? document;
   const handleKeyDown = (event: KeyboardEvent) => {
-    console.log('[KEYBOARD ROOT] Key pressed:', event.key, 'Target:', event.target);
-
     // Check if we should handle this key (navigation keys)
     const isNavigationKey = [
       'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
       'PageUp', 'PageDown', 'Home', 'End', 'Tab', 'Enter', 'Escape'
     ].includes(event.key) || (event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey));
 
-    console.log('[KEYBOARD ROOT] isNavigationKey:', isNavigationKey);
-
     const hasSelectionResult = hasSelection?.();
-    console.log('[KEYBOARD ROOT] hasSelection:', hasSelectionResult);
-    console.log('[KEYBOARD ROOT] activeElement:', ownerDocument.activeElement);
-    console.log('[KEYBOARD ROOT] focusElement:', focusElement);
-    console.log('[KEYBOARD ROOT] isFocused:', ownerDocument.activeElement === focusElement);
 
     // If it's a navigation key and the grid has a selection,
     // ensure focus and let the handler decide preventDefault
     if (isNavigationKey && hasSelectionResult) {
-      console.log('[KEYBOARD ROOT] ✅ INTERCEPTING NAVIGATION KEY - ensuring focus');
       // Focus the element if not already focused
       if (ownerDocument.activeElement !== focusElement) {
-        console.log('[KEYBOARD ROOT] Focusing grid element');
         focusElement.focus({ preventScroll: true });
       }
-      console.log('[KEYBOARD ROOT] Calling onKeyDown handler (will handle preventDefault)');
       onKeyDown(event);
       // Prevent default AFTER calling handler, so handler can process it
       if (!event.defaultPrevented) {
-        console.log('[KEYBOARD ROOT] Handler did not preventDefault, doing it now');
         event.preventDefault();
       }
       event.stopPropagation();
@@ -553,15 +531,10 @@ export function createFocusableElement(
     }
 
     // Otherwise, only handle if already focused
-    if (ownerDocument.activeElement !== focusElement) {
-      console.log('[KEYBOARD ROOT] Not focused, ignoring');
-      return;
-    }
-    console.log('[KEYBOARD ROOT] Focused, calling onKeyDown');
+    if (ownerDocument.activeElement !== focusElement) return;
     onKeyDown(event);
   };
 
-  console.log('[KEYBOARD ROOT] Registering keydown listener on document');
   ownerDocument.addEventListener('keydown', handleKeyDown, true);
   container.appendChild(focusElement);
   return {
