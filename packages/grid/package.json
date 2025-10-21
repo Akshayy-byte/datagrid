@@ -1,6 +1,6 @@
 {
   "name": "@coleski/datagrid",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Ultra-fast canvas-based data grid for React",
   "type": "module",
   "sideEffects": false,
